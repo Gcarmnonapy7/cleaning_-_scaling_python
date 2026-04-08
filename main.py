@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
   
-
 class StatisticAnalysis:
 
     def __init__(self, data: pd.DataFrame):
@@ -16,7 +15,33 @@ class StatisticAnalysis:
     def __len__(self):
         
         return len(self.data)
+    
+    def __repr__(self):
+        rows,cols = self.data.shape
+        return f"StatisticAnalysis(rows={rows},columns={cols})"
 
+    def __getitem__(self, key):
+        
+        return self.data[key]
+    
+    def __setitem__(self, key, value):
+        
+        self.data[key] = value 
+    
+    def __iter__(self):
+        """_summary_
+        
+        Allows : for loops (iter)
+
+        Returns:
+            _type_: _description_
+        """
+        return iter(self.data.columns)
+    
+    def __contains__(self, item):
+        
+        return item in self.data.columns # Boolean return
+    
     def compute_statistics(self):
 
         numeric_data = self.data.select_dtypes(include="number")
@@ -82,10 +107,17 @@ class StatisticAnalysis:
         return counts
     
     def isnull_data(self):
-        pass
+        
+        
+        
+        for col in self.data.columns:
+            pass
+            
     
     def duplicated_data(self):
         pass
+    
+    
 
             
         
