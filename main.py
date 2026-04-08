@@ -1,43 +1,95 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import seaborn as sns
-
-
-
-def checking_null_data(data: pd.DataFrame):
-    
-    total_rows = len(data)
-
-    for col in data.columns:
-        is_null = data[col].isna().sum()
-        percent = (is_null / total_rows) * 100
-
-        if is_null > 0:
-            print("=" * 60)
-            print(f"Column: {col}")
-            print(f"Missing values: {is_null}\n")
-            print(f"Percentage: {percent:.2f}%\n")
-            print("=" * 60)
-            
-            
-def duplicated_data(data:pd.DataFrame):
-    
-    total = len(data)
-    
-    for col in data.columns:
-        
-        is_duplicated = data[col].duplicated.sum()
-        percent = (is_duplicated / total) * 100
-        
-    if is_duplicated > 0 :
-        print("=" * 60)
-        print()
-        print("=" * 60)
-        
-
+  
 
 class StatisticAnalysis:
+
+    def __init__(self, data: pd.DataFrame):
+        self.data = data
+        self.statistics = []
+        self.null_results = []
+        self.duplicated = []
+        self.outliers = {}
+        
+    def __len__(self):
+        
+        return len(self.data)
+
+    def compute_statistics(self):
+
+        numeric_data = self.data.select_dtypes(include="number")
+
+        for col in numeric_data.columns:
+            stats = {
+                "column": col,
+                "mean": numeric_data[col].mean(),
+                "median": numeric_data[col].median(),
+                "std": numeric_data[col].std(),
+                "min": numeric_data[col].min(),
+                "max": numeric_data[col].max()
+            }
+
+            self.statistics.append(stats)
+
+        return pd.DataFrame(self.statistics).T
+
+    def normalize(self):
+        """
+        Min-max normalization for numeric columns
+        """
+        
+        numeric = self.data.select_dtypes(include="number")
+        
+        normalized = (numeric - numeric.min()) / (numeric.max() - numeric.min())
+        
+        return normalized
+        
+    def outliers_detection(self):
+        
+        numeric = self.data.select_dtypes(include="number")
+        
+        for col in numeric.columns:
+            
+            Q1 = numeric[col].quantile(0.25)
+            Q3 = numeric[col].quantile(0.75)
+            
+            IQR = Q3 - Q1
+            
+            lower = Q1 - 1.5 * IQR
+            upper = Q3 + 1.5 * IQR
+
+            self.outliers[col] = numeric[(numeric[col] < lower) | (numeric[col] > upper)][col]
+
+        return self.outliers
+
+    def correlation_analysis(self):
+        
+        numeric = self.data.select_dtypes(include="number")
+        
+        return numeric.corr()
+
+    def counting_values(self):
+        
+        numeric = self.data.select_dtypes(include="number")
+        counts = {}
+        
+        for col in numeric.columns:
+            
+            counts[col] = self.data[col].value_counts()
+            
+        return counts
     
-    def __init__(self):
+    def isnull_data(self):
         pass
+    
+    def duplicated_data(self):
+        pass
+
+            
+        
+        
+
+                    
+        
